@@ -7,23 +7,23 @@ public class VirtualPetTest {
 
 	@Test
 	public void shouldGetName() {
-		VirtualPet undertest = new VirtualPet("tommy", "hungry");
-		String actual = undertest.name;
+		Dog undertest = new Dog("tommy", "hungry");
+		String actual = undertest.getName();
 		Assert.assertEquals("tommy", actual);
 	}
 
 	@Test
 	public void shouldGetDesc() {
-		VirtualPet undertest = new VirtualPet("tommy", "hungry");
-		String actual = undertest.description;
+		Dog undertest = new Dog("tommy", "hungry");
+		String actual = undertest.getDescription();
 		Assert.assertEquals("hungry", actual);
 	}
 
 	@Test
 	public void shouldIncreaseHunger() {
-		VirtualPet undertest = new VirtualPet("tommy", "hungry");
+		Dog undertest = new Dog("tommy", "hungry");
 		undertest.increaseHunger();
-		int actual = undertest.hunger;
+		int actual = undertest.getHunger();
 		Assert.assertEquals(10, actual);
 	}
 

@@ -8,10 +8,10 @@ public class VirtualPetShelterApp {
 		Scanner input = new Scanner(System.in);
 		boolean quit = false;
 		VirtualPetShelter petShelter = new VirtualPetShelter();
-		petShelter.createPet("Tommy", "Calico cat. Constantly purring.", 30, 10, 50);
-		petShelter.createPet("Charles", "Beagle. Howls a lot.", 60, 40, 20);
-		petShelter.createPet("Minnie", "Chocolat lab. Will do anything for attention.", 0, 20, 70);
-		petShelter.createPet("Freddie", "Coy fish. Follows your movements.", 50, 0, 10);
+		petShelter.createCat("Tommy", "Calico cat. Constantly purring.", 30, 10);
+		petShelter.createDog("Charles", "Beagle. Howls a lot.", 60, 40);
+		petShelter.createDog("Minnie", "Chocolat lab. Will do anything for attention.", 0, 20);
+		petShelter.createPet("Freddie", "Coy fish. Follows your movements.", 50, 0);
 
 		System.out.println("Welcome to back to the shelter.");
 		System.out.println();
@@ -35,7 +35,7 @@ public class VirtualPetShelterApp {
 				petShelter.hydrateAllPets();
 				break;
 			case 3:
-				playWithPet(input, petShelter);
+				walkDogs(input, petShelter);
 				break;
 			case 4:
 				adopt(input, petShelter);
@@ -53,6 +53,11 @@ public class VirtualPetShelterApp {
 		System.out.println("Thanks for volunteering!");
 	}
 
+	private static void walkDogs(Scanner input, VirtualPetShelter petShelter) {
+		System.out.println("You walk all dogs");
+		petShelter.walkDogs();
+	}
+
 	private static void adopt(Scanner input, VirtualPetShelter petShelter) {
 		System.out.println("Choose which pet you would like to adopt.");
 		System.out.println();
@@ -64,21 +69,10 @@ public class VirtualPetShelterApp {
 		petShelter.adoptPet(name);
 	}
 
-	private static void playWithPet(Scanner input, VirtualPetShelter petShelter) {
-		System.out.println("Choose which pet you would like to play with.");
-		System.out.println();
-		displayPetNamesAndDescriptions(petShelter);
-		System.out.println("Enter the name of the pet you would like to play with.");
-		String name = input.nextLine();
-		System.out.println();
-		System.out.println("You play with " + name);
-		petShelter.play(name);
-	}
-
 	private static void displayPetNamesAndDescriptions(VirtualPetShelter petShelter) {
 		for (VirtualPet pet : petShelter.getPets()) {
 			System.out.println(pet.toString());
-			System.out.println("[" + pet.name + "] " + pet.description);
+			System.out.println("[" + pet.getName() + "] " + pet.getDescription());
 		}
 	}
 
@@ -98,7 +92,12 @@ public class VirtualPetShelterApp {
 		System.out.println("Name\t|Hunger\t|Thirst\t|Boredom");
 		System.out.println("--------------------------------");
 		for (VirtualPet pet : petShelter.getPets()) {
-			System.out.println(pet.name + "\t|" + pet.hunger + "\t|" + pet.thirst + "\t|" + pet.boredom);
+			System.out.println(pet.getName() + "\t|" + pet.getHunger() + "\t|" + pet.getThirst());
+			if (pet instanceof Dog) {
+				System.out.println(pet.getName() + "\t|" + pet.getHunger() + "\t|" + pet.getThirst() + "\t|"
+						+ ((Dog) pet).getBoredom());
+			}
+
 		}
 		System.out.println();
 		System.out.println("What would you like to do?");
