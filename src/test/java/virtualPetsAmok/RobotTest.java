@@ -10,20 +10,19 @@ import org.junit.Test;
 public class RobotTest {
 
 	@Test
-	public void shouldDecreaseOil() {
-		Robot underTest = new Robot("", "");
-		underTest.decreaseOil();
-		int actual = underTest.getOilLevel();
-		assertThat(actual, is(80));
+	public void shouldGetOiled() {
+		Robot underTest = new Robot("", "", "");
+		underTest.needsOil();
+		underTest.oilChange();
+		boolean actual = underTest.getOilState();
+		assertThat(actual, is(true));
 	}
 
 	@Test
-	public void shouldGetOiled() {
-		Robot underTest = new Robot("", "");
-		underTest.decreaseOil();
-		underTest.fillOil();
-		int actual = underTest.getOilLevel();
-		assertThat(actual, is(100));
+	public void shouldNotNeedOil() {
+		Robot underTest = new Robot("", "", "");
+		underTest.oilChange();
+		boolean actual = underTest.getOilState();
+		assertThat(actual, is(true));
 	}
-
 }

@@ -1,6 +1,6 @@
 package virtualPetsAmok;
 
-public class Cat extends VirtualPet {
+public class Cat extends LandPet {
 
 	public Cat(String name, String description) {
 		super(name, description);

@@ -1,28 +1,39 @@
 package virtualPetsAmok;
 
-public class Robot extends VirtualPet {
+public class Robot extends Pet {
 
-	private int oilLevel;
+	private boolean oiled;
+	private boolean cat;
+	private boolean dog;
 
-	public Robot(String name, String description) {
+	public Robot(String name, String description, String type) {
 		super(name, description);
-		oilLevel = 100;
+		oiled = false;
+		if (type.equalsIgnoreCase("dog")) {
+			this.dog = true;
+		} else if (type.equalsIgnoreCase("cat")) {
+			this.cat = true;
+		}
 	}
 
-	public Robot(String name, String description, int hunger, int thirst) {
-		super(name, description, hunger, thirst);
+	public boolean isCat() {
+		return cat;
 	}
 
-	public int getOilLevel() {
-		return oilLevel;
+	public boolean isDog() {
+		return dog;
 	}
 
-	public void decreaseOil() {
-		oilLevel -= 20;
+	public void needsOil() {
+		oiled = false;
 	}
 
-	public void fillOil() {
-		oilLevel = 100;
+	public void oilChange() {
+		oiled = true;
+	}
+
+	public boolean getOilState() {
+		return oiled;
 	}
 
 }

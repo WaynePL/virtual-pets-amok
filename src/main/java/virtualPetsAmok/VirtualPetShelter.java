@@ -6,27 +6,39 @@ import java.util.Map;
 
 public class VirtualPetShelter {
 
-	private Map<String, VirtualPet> pets = new HashMap<String, VirtualPet>();
+	private Map<String, Pet> pets = new HashMap<String, Pet>();
 	private int litterBoxWaste;
+	private int dogCageWaste;
 
 	public void tick() {
-		for (VirtualPet pet : pets.values()) {
-			pet.increaseHunger();
-			pet.increaseThirst();
+		for (Pet pet : pets.values()) {
+			if (pet instanceof OrganicPet) {
+				((OrganicPet) pet).increaseHunger();
+			}
+			if (pet instanceof LandPet) {
+				((LandPet) pet).increaseThirst();
+			}
 			if (pet instanceof Dog) {
 				((Dog) pet).increaseBoredom();
 			}
 			if (pet instanceof Robot) {
-				((Robot) pet).decreaseOil();
+				if (pet.getHappiness() < 50 && ((Robot) pet).isCat()) {
+					((Robot) pet).needsOil();
+				}
 			}
-
+			if (pet instanceof Cat) {
+				if (getLitterBoxWaste() > 5) {
+					pet.decreaseHealth();
+				}
+			}
 		}
 		litterBoxWaste += numberOfCats();
+		dogCageWaste += numberOfDogs();
 	}
 
 	private int numberOfCats() {
 		int cats = 0;
-		for (VirtualPet pet : getPets()) {
+		for (Pet pet : getPets()) {
 			if (pet instanceof Cat) {
 				cats++;
 			}
@@ -34,12 +46,22 @@ public class VirtualPetShelter {
 		return cats;
 	}
 
+	private int numberOfDogs() {
+		int dogs = 0;
+		for (Pet pet : getPets()) {
+			if (pet instanceof Dog) {
+				dogs++;
+			}
+		}
+		return dogs;
+	}
+
 	public int getThirst(String name) {
-		return pets.get(name).getThirst();
+		return ((LandPet) pets.get(name)).getThirst();
 	}
 
 	public int getHunger(String name) {
-		return pets.get(name).getHunger();
+		return ((OrganicPet) pets.get(name)).getHunger();
 	}
 
 	public int getBoredom(String name) {
@@ -52,7 +74,6 @@ public class VirtualPetShelter {
 
 	public void createDog(String name, String desc, int hunger, int thirst) {
 		pets.put(name, new Dog(name, desc, hunger, thirst));
-
 	}
 
 	public void createCat(String name, String desc) {
@@ -63,69 +84,89 @@ public class VirtualPetShelter {
 		pets.put(name, new Cat(name, desc, hunger, thirst));
 	}
 
-	public void createRobot(String name, String desc, int hunger, int thirst) {
-		pets.put(name, new Robot(name, desc, hunger, thirst));
-
+	public void createRobot(String name, String desc, String type) {
+		pets.put(name, new Robot(name, desc, type));
 	}
 
-	public void createRobot(String name, String desc) {
-		pets.put(name, new Robot(name, desc));
+	public void createFish(String name, String desc, int hunger) {
+		pets.put(name, new Fish(name, desc, hunger));
+	}
 
+	public void createFish(String name, String desc) {
+		pets.put(name, new Fish(name, desc));
 	}
 
 	public int getNumberOfPets() {
-
-		// TODO Auto-generated method stub
 		return pets.size();
 	}
 
 	public void feedAllPets() {
-		// TODO Auto-generated method stub
-		for (VirtualPet pet : pets.values()) {
-			pet.feed();
+		for (Pet pet : pets.values()) {
+			if (pet instanceof OrganicPet) {
+				((OrganicPet) pet).feed();
+			}
 		}
 	}
 
 	public void hydrateAllPets() {
-		// TODO Auto-generated method stub
-		for (VirtualPet pet : pets.values()) {
-			pet.hydrate();
+		for (Pet pet : pets.values()) {
+			if (pet instanceof LandPet) {
+				((LandPet) pet).hydrate();
+			}
 		}
 	}
 
-	public Collection<VirtualPet> getPets() {
-		// TODO Auto-generated method stub
+	public Collection<Pet> getPets() {
 		return pets.values();
 	}
 
 	public void adoptPet(String name) {
-
 		pets.remove(name);
 	}
 
-	public VirtualPet getPet(String name) {
+	public Pet getPet(String name) {
 		return pets.get(name);
 	}
 
 	public void walkDogs() {
-		for (VirtualPet pet : getPets()) {
+		for (Pet pet : getPets()) {
 			if (pet instanceof Walks) {
+				if (pet instanceof Robot) {
+					if (((Robot) pet).isDog()) {
+						((Robot) pet).needsOil();
+					}
+				}
 				((Walks) pet).walk();
 			}
 		}
 	}
 
 	public void oilRobots() {
-		for (VirtualPet pet : getPets()) {
+		for (Pet pet : getPets()) {
 			if (pet instanceof Robot) {
-				((Robot) pet).fillOil();
+				((Robot) pet).oilChange();
 			}
 		}
 	}
 
 	public int getLitterBoxWaste() {
-
 		return litterBoxWaste;
+	}
+
+	public int getdogCageWaste() {
+		return dogCageWaste;
+	}
+
+	public void cleanDogWaste() {
+		dogCageWaste = 0;
+	}
+
+	public void cleanCatWaste() {
+		litterBoxWaste = 0;
+	}
+
+	public boolean getOilState(String name) {
+		return ((Robot) pets.get(name)).getOilState();
 	}
 
 }

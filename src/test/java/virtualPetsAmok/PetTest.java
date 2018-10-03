@@ -3,7 +3,7 @@ package virtualPetsAmok;
 import org.junit.Assert;
 import org.junit.Test;
 
-public class VirtualPetTest {
+public class PetTest {
 
 	@Test
 	public void shouldGetName() {

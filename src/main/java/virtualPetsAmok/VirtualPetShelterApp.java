@@ -9,9 +9,10 @@ public class VirtualPetShelterApp {
 		boolean quit = false;
 		VirtualPetShelter petShelter = new VirtualPetShelter();
 		petShelter.createCat("Tommy", "Calico cat. Constantly purring.", 30, 10);
-		petShelter.createDog("Charles", "Beagle. Howls a lot.", 60, 40);
-		petShelter.createDog("Minnie", "Chocolat lab. Will do anything for attention.", 0, 20);
-		petShelter.createPet("Freddie", "Coy fish. Follows your movements.", 50, 0);
+		petShelter.createRobot("Charles", "Looks a lot like a Beagle. Howls a lot.", "dog");
+		petShelter.createDog("Minnie", "Chocolat lab. Will do anything for attention.", 40, 60);
+		petShelter.createFish("Freddie", "Coy fish. Follows your movements.", 50);
+		petShelter.createRobot("Pizza", "Definitely not a robot", "cat");
 
 		System.out.println("Welcome to back to the shelter.");
 		System.out.println();
@@ -35,15 +36,24 @@ public class VirtualPetShelterApp {
 				petShelter.hydrateAllPets();
 				break;
 			case 3:
-				walkDogs(input, petShelter);
+				walkDogs(petShelter);
 				break;
 			case 4:
-				adopt(input, petShelter);
+				petShelter.cleanDogWaste();
 				break;
 			case 5:
-				admitPet(input, petShelter);
+				petShelter.cleanCatWaste();
 				break;
 			case 6:
+				petShelter.oilRobots();
+				break;
+			case 7:
+				adopt(input, petShelter);
+				break;
+			case 8:
+				admitPet(input, petShelter);
+				break;
+			case 9:
 				quit = true;
 				continue;
 			}
@@ -53,7 +63,7 @@ public class VirtualPetShelterApp {
 		System.out.println("Thanks for volunteering!");
 	}
 
-	private static void walkDogs(Scanner input, VirtualPetShelter petShelter) {
+	private static void walkDogs(VirtualPetShelter petShelter) {
 		System.out.println("You walk all dogs");
 		petShelter.walkDogs();
 	}
@@ -70,7 +80,7 @@ public class VirtualPetShelterApp {
 	}
 
 	private static void displayPetNamesAndDescriptions(VirtualPetShelter petShelter) {
-		for (VirtualPet pet : petShelter.getPets()) {
+		for (Pet pet : petShelter.getPets()) {
 			System.out.println(pet.toString());
 			System.out.println("[" + pet.getName() + "] " + pet.getDescription());
 		}
@@ -78,36 +88,82 @@ public class VirtualPetShelterApp {
 
 	private static void admitPet(Scanner input, VirtualPetShelter petShelter) {
 		System.out.println("Thank you for bringing your pet.");
+		System.out.println();
+		System.out.println("What kind of pet are you bringing in?");
+		System.out.println("1. Fish");
+		System.out.println("2. Cat");
+		System.out.println("3. Dog");
+		System.out.println("4. Robot Cat");
+		System.out.println("5. Robot Dog");
+		String choiceString = input.nextLine();
+		int choice = 0;
+		try {
+			choice = Integer.parseInt(choiceString);
+		} catch (Exception e) {
+			System.out.println("You did not enter a number, please try again");
+			admitPet(input, petShelter);
+		}
 		System.out.println("What is your pet's name?");
 		String name = input.nextLine();
 		System.out.println("Please describe your pet.");
 		String desc = input.nextLine();
+		switch (choice) {
+		case 1:
+			petShelter.createFish(name, desc);
+			break;
+		case 2:
+			petShelter.createCat(name, desc);
+			break;
+		case 3:
+			petShelter.createDog(name, desc);
+			break;
+		case 4:
+			petShelter.createRobot(name, desc, "cat");
+			break;
+		case 5:
+			petShelter.createRobot(name, desc, "dog");
+		}
 		System.out.println("We will take good care of " + name + ".");
-		petShelter.createPet(name, desc);
 	}
 
 	private static void displayStatusAndOptions(VirtualPetShelter petShelter) {
 		System.out.println("Here is the status of our guests:");
 		System.out.println();
-		System.out.println("Name\t|Hunger\t|Thirst\t|Boredom");
-		System.out.println("--------------------------------");
-		for (VirtualPet pet : petShelter.getPets()) {
-			System.out.println(pet.getName() + "\t|" + pet.getHunger() + "\t|" + pet.getThirst());
+		System.out.println("Name\t|Hunger\t\t|Thirst\t\t|Boredom\t|Oil Status\t|Happiness\t|Health");
+		System.out.println(
+				"-----------------------------------------------------------------------------------------------");
+		for (Pet pet : petShelter.getPets()) {
 			if (pet instanceof Dog) {
-				System.out.println(pet.getName() + "\t|" + pet.getHunger() + "\t|" + pet.getThirst() + "\t|"
-						+ ((Dog) pet).getBoredom());
+				System.out.println(pet.getName() + "\t|" + ((LandPet) pet).getHunger() + "\t\t|"
+						+ ((LandPet) pet).getThirst() + "\t\t|" + ((Dog) pet).getBoredom() + "\t\t|" + "No Oil\t\t|"
+						+ pet.getHappiness() + "\t\t|" + pet.getHealth());
+			} else if (pet instanceof LandPet) {
+				System.out.println(pet.getName() + "\t|" + ((LandPet) pet).getHunger() + "\t\t|"
+						+ ((LandPet) pet).getThirst() + "\t\t|" + "Never Bored\t|" + "No Oil\t\t|" + pet.getHappiness()
+						+ "\t\t|" + pet.getHealth());
+			} else if (pet instanceof OrganicPet) {
+				System.out.println(pet.getName() + "\t|" + ((OrganicPet) pet).getHunger() + "\t\t|" + "Never Thirsty\t|"
+						+ "Never Bored\t|" + "No Oil\t\t|" + pet.getHappiness() + "\t\t|" + pet.getHealth());
+			} else if (pet instanceof Robot) {
+				System.out.println(pet.getName() + "\t|" + "Never Hungry\t|" + "Never Thirsty\t|" + "Never Bored\t|"
+						+ ((Robot) pet).getOilState() + "\t\t|" + pet.getHappiness() + "\t\t|" + pet.getHealth());
 			}
-
 		}
+
+		System.out.println("Dog Cages with a mess: " + petShelter.getdogCageWaste());
+		System.out.println("Waste in the litter box: " + petShelter.getLitterBoxWaste());
 		System.out.println();
 		System.out.println("What would you like to do?");
 		System.out.println();
 		System.out.println("1. Feed the pets");
 		System.out.println("2. Hydrate the pets");
-		System.out.println("3. Play with a pet");
-		System.out.println("4. Adopt a pet");
-		System.out.println("5. Admit a pet");
-		System.out.println("6. Quit");
+		System.out.println("3. Walk the dogs");
+		System.out.println("4. Clean the dog cages");
+		System.out.println("5. Clean the litter box");
+		System.out.println("6. Change the oil for the robots");
+		System.out.println("7. Adopt a pet");
+		System.out.println("8. Admit a pet");
+		System.out.println("9. Quit");
 		System.out.println();
 	}
 }

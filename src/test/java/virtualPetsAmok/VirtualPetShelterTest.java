@@ -1,5 +1,6 @@
 package virtualPetsAmok;
 
+import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
@@ -84,8 +85,8 @@ public class VirtualPetShelterTest {
 		undertest.createDog("Charles", "Thirsty");
 		undertest.feedAllPets();
 
-		for (VirtualPet pet : undertest.getPets()) {
-			assertEquals(-20, pet.getHunger());
+		for (Pet pet : undertest.getPets()) {
+			assertEquals(-20, ((OrganicPet) pet).getHunger());
 		}
 	}
 
@@ -96,8 +97,8 @@ public class VirtualPetShelterTest {
 		undertest.createDog("Charles", "Thirsty");
 		undertest.hydrateAllPets();
 
-		for (VirtualPet pet : undertest.getPets()) {
-			assertEquals(-20, pet.getThirst());
+		for (Pet pet : undertest.getPets()) {
+			assertEquals(-20, ((LandPet) pet).getThirst());
 		}
 	}
 
@@ -106,8 +107,8 @@ public class VirtualPetShelterTest {
 		VirtualPetShelter undertest = new VirtualPetShelter();
 		undertest.createDog("Tommy", "Hungry");
 		undertest.createDog("Charles", "Thirsty");
-		VirtualPet expected = undertest.getPet("Charles");
-		Collection<VirtualPet> actual = undertest.getPets();
+		Pet expected = undertest.getPet("Charles");
+		Collection<Pet> actual = undertest.getPets();
 
 		assertThat(actual, hasItem(expected));
 	}
@@ -117,10 +118,10 @@ public class VirtualPetShelterTest {
 		VirtualPetShelter undertest = new VirtualPetShelter();
 		undertest.createDog("Tommy", "Hungry");
 		undertest.createDog("Charles", "Thirsty");
-		VirtualPet tommy = undertest.getPet("Tommy");
+		Pet tommy = undertest.getPet("Tommy");
 		undertest.adoptPet("Tommy");
 
-		Collection<VirtualPet> actual = undertest.getPets();
+		Collection<Pet> actual = undertest.getPets();
 		assertThat(actual, not(hasItem(tommy)));
 	}
 
@@ -130,11 +131,11 @@ public class VirtualPetShelterTest {
 		undertest.createDog("Tommy", "Hungry");
 		undertest.createDog("Charles", "Thirsty");
 		undertest.createDog("Fred", "Ugly", 60, 40);
-		VirtualPet fred = undertest.getPet("Fred");
+		Pet fred = undertest.getPet("Fred");
 
-		Collection<VirtualPet> actual = undertest.getPets();
+		Collection<Pet> actual = undertest.getPets();
 		assertThat(actual, hasItem(fred));
-		assertEquals(60, fred.getHunger());
+		assertEquals(60, ((OrganicPet) fred).getHunger());
 	}
 
 	@Test
@@ -144,7 +145,7 @@ public class VirtualPetShelterTest {
 		undertest.createDog("Charles", "Thirsty");
 		undertest.createDog("Fred", "Ugly", 60, 40);
 		undertest.walkDogs();
-		for (VirtualPet pet : undertest.getPets()) {
+		for (Pet pet : undertest.getPets()) {
 			if (pet instanceof Dog) {
 				assertThat(((Dog) pet).getBoredom(), is(0));
 			}
@@ -155,13 +156,13 @@ public class VirtualPetShelterTest {
 	public void shouldOilAllRobots() {
 		VirtualPetShelter undertest = new VirtualPetShelter();
 		undertest.createDog("Tommy", "Hungry");
-		undertest.createRobot("Charles", "Thirsty");
-		undertest.createRobot("Fred", "Ugly", 60, 40);
+		undertest.createRobot("Charles", "Thirsty", "dog");
+		undertest.createRobot("Fred", "Ugly", "dog");
 		undertest.tick();
 		undertest.oilRobots();
-		for (VirtualPet pet : undertest.getPets()) {
+		for (Pet pet : undertest.getPets()) {
 			if (pet instanceof Robot) {
-				assertThat(((Robot) pet).getOilLevel(), is(100));
+				assertThat(((Robot) pet).getOilState(), is(true));
 			}
 		}
 	}
@@ -170,11 +171,65 @@ public class VirtualPetShelterTest {
 	public void shouldMakeWasteInLitterBox() {
 		VirtualPetShelter undertest = new VirtualPetShelter();
 		undertest.createDog("Tommy", "Hungry");
-		undertest.createRobot("Charles", "Thirsty");
+		undertest.createRobot("Charles", "Thirsty", "dog");
 		undertest.createCat("Fred", "Ugly", 60, 40);
 		undertest.tick();
 		int result = undertest.getLitterBoxWaste();
 		assertThat(result, is(1));
 
 	}
+
+	@Test
+	public void shouldMakeWasteInDogCage() {
+		VirtualPetShelter undertest = new VirtualPetShelter();
+		undertest.createDog("Tommy", "Hungry");
+		undertest.createRobot("Charles", "Thirsty", "dog");
+		undertest.createCat("Fred", "Ugly", 60, 40);
+		undertest.tick();
+		int actual = undertest.getdogCageWaste();
+		assertThat(actual, is(equalTo(1)));
+	}
+
+	@Test
+	public void shouldReduceDogWaste() {
+		VirtualPetShelter undertest = new VirtualPetShelter();
+		undertest.createDog("Tommy", "Hungry");
+		undertest.createRobot("Charles", "Thirsty", "dog");
+		undertest.createCat("Fred", "Ugly", 60, 40);
+		undertest.tick();
+		undertest.cleanDogWaste();
+		int actual = undertest.getdogCageWaste();
+		assertThat(actual, is(equalTo(0)));
+	}
+
+	@Test
+	public void shouldReduceCatWaste() {
+		VirtualPetShelter undertest = new VirtualPetShelter();
+		undertest.createDog("Tommy", "Hungry");
+		undertest.createRobot("Charles", "Thirsty", "dog");
+		undertest.createCat("Fred", "Ugly", 60, 40);
+		undertest.tick();
+		undertest.cleanCatWaste();
+		int actual = undertest.getLitterBoxWaste();
+		assertThat(actual, is(equalTo(0)));
+	}
+
+	@Test
+	public void shouldMakeRobotCatsNeedOil() {
+		VirtualPetShelter undertest = new VirtualPetShelter();
+		undertest.createDog("Tommy", "Hungry");
+		undertest.createRobot("Charles", "Thirsty", "cat");
+		undertest.createCat("Fred", "Ugly", 60, 40);
+		undertest.oilRobots();
+		undertest.tick();
+		undertest.tick();
+		undertest.tick();
+		undertest.tick();
+		undertest.tick();
+		undertest.tick();
+		undertest.tick();
+		boolean actual = undertest.getOilState("Charles");
+		assertThat(actual, is(equalTo(false)));
+	}
+
 }

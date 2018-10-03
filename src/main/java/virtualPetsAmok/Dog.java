@@ -1,6 +1,6 @@
 package virtualPetsAmok;
 
-public class Dog extends VirtualPet implements Walks {
+public class Dog extends LandPet implements Walks {
 	private int boredom;
 
 	public Dog(String name, String description) {
